@@ -1,6 +1,7 @@
 import type { Express } from "express";
 import type { Server } from "http";
 import { storage } from "./storage";
+import { registerBotRoutes } from "./bot-routes";
 import { api } from "@shared/routes";
 import { z } from "zod";
 
@@ -8,6 +9,8 @@ export async function registerRoutes(
   httpServer: Server,
   app: Express
 ): Promise<Server> {
+  // Register bot routes
+  registerBotRoutes(app);
   app.get(api.challenges.list.path, async (req, res) => {
     const challenges = await storage.getChallenges();
     res.json(challenges);

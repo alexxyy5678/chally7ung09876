@@ -24,15 +24,32 @@ export const leaderboard = pgTable("leaderboard", {
   totalBets: integer("total_bets").notNull().default(0),
 });
 
+export const pendingChallenges = pgTable("pending_challenges", {
+  id: serial("id").primaryKey(),
+  cardId: text("card_id").notNull().unique(),
+  title: text("title").notNull(),
+  description: text("description").notNull(),
+  stakeAmount: integer("stake_amount").notNull(),
+  timeLimit: text("time_limit").notNull(),
+  link: text("link").notNull(),
+  castHash: text("cast_hash").notNull(),
+  status: text("status").notNull().default("pending"), // pending, approved, rejected
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
 // === BASE SCHEMAS ===
 export const insertChallengeSchema = createInsertSchema(challenges).omit({ id: true, createdAt: true });
 export const insertLeaderboardSchema = createInsertSchema(leaderboard).omit({ id: true });
+export const insertPendingChallengeSchema = createInsertSchema(pendingChallenges).omit({ id: true, createdAt: true });
 
 // === EXPLICIT API CONTRACT TYPES ===
 export type Challenge = typeof challenges.$inferSelect;
 export type InsertChallenge = z.infer<typeof insertChallengeSchema>;
 
 export type LeaderboardEntry = typeof leaderboard.$inferSelect;
+
+export type PendingChallenge = typeof pendingChallenges.$inferSelect;
+export type InsertPendingChallenge = z.infer<typeof insertPendingChallengeSchema>;
 
 export type CreateChallengeRequest = InsertChallenge;
 export type UpdateChallengeRequest = Partial<InsertChallenge>;
@@ -41,3 +58,6 @@ export type ChallengeResponse = Challenge;
 export type ChallengesListResponse = Challenge[];
 
 export type LeaderboardResponse = LeaderboardEntry[];
+
+export type PendingChallengeResponse = PendingChallenge;
+export type PendingChallengesListResponse = PendingChallenge[];
